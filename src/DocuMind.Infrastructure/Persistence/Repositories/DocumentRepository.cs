@@ -32,6 +32,23 @@ public class DocumentRepository : IDocumentRepository
             .ToListAsync(ct);
     }
 
+    public async Task<(List<Document> Items, int TotalCount)> GetPagedAsync(
+        int page, int pageSize, CancellationToken ct = default)
+    {
+        var query = _db.Documents
+            .Include(d => d.Chunks)
+            .OrderByDescending(d => d.UploadedAt);
+
+        var totalCount = await query.CountAsync(ct);
+
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(ct);
+
+        return (items, totalCount);
+    }
+
     public async Task AddAsync(Document document, CancellationToken ct = default)
     {
         await _db.Documents.AddAsync(document, ct);

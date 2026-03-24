@@ -2,6 +2,7 @@ using System.Net;
 using DocuMind.Application.Exceptions;
 using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace DocuMind.API.Middleware;
 
@@ -40,8 +41,14 @@ public class GlobalExceptionHandler : IMiddleware
         catch (Exception ex)
         {
             _logger.LogError(ex, "Unhandled exception");
+
+            var env = context.RequestServices.GetService<IHostEnvironment>();
+            var errors = env?.IsDevelopment() == true
+                ? new[] { ex.Message, ex.InnerException?.Message ?? "" }
+                : new[] { "An unexpected error occurred." };
+
             await WriteProblemDetails(context, HttpStatusCode.InternalServerError,
-                "Internal Server Error", ["An unexpected error occurred."]);
+                "Internal Server Error", errors);
         }
     }
 

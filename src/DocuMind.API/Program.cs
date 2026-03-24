@@ -7,15 +7,16 @@ using Serilog;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
-    .CreateBootstrapLogger();
+    .CreateLogger();
 
 try
 {
     var builder = WebApplication.CreateBuilder(args);
 
-    // Serilog
-    builder.Host.UseSerilog((context, config) => config
-        .ReadFrom.Configuration(context.Configuration)
+    // Serilog — use AddSerilog instead of UseSerilog to avoid the
+    // ReloadableLogger/freeze pattern that breaks WebApplicationFactory
+    builder.Services.AddSerilog(config => config
+        .ReadFrom.Configuration(builder.Configuration)
         .WriteTo.Console()
         .WriteTo.File("logs/documind-.log", rollingInterval: RollingInterval.Day));
 
@@ -24,7 +25,12 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
 
     // API stuff
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(
+                new System.Text.Json.Serialization.JsonStringEnumConverter());
+        });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(options =>
     {

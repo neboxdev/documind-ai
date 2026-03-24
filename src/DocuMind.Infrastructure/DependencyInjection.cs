@@ -2,6 +2,7 @@ using DocuMind.Application.Interfaces;
 using DocuMind.Infrastructure.AI.Configuration;
 using DocuMind.Infrastructure.Persistence;
 using DocuMind.Infrastructure.Persistence.Repositories;
+using DocuMind.Infrastructure.TextProcessing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,12 @@ public static class DependencyInjection
         // Repositories
         services.AddScoped<IDocumentRepository, DocumentRepository>();
         services.AddScoped<IConversationRepository, ConversationRepository>();
+
+        // Text processing
+        services.AddSingleton<ITextExtractor, PdfTextExtractor>();
+        services.AddSingleton<ITextExtractor, DocxTextExtractor>();
+        services.AddSingleton<ITextExtractor, PlainTextExtractor>();
+        services.AddSingleton<ITextChunker, TextChunker>();
 
         // AI provider configuration — actual provider implementations
         // will be registered in Day 3 via AddAIProviders()

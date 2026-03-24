@@ -7,4 +7,4 @@ public record UploadDocumentCommand(
     Stream FileStream,
     string FileName,
     string ContentType,
-    long Size) : IRequest<DocumentDto>;
+    long Size) : IRequest<DocumentOutDTO>;

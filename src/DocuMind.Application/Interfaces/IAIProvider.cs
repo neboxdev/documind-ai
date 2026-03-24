@@ -10,5 +10,5 @@ namespace DocuMind.Application.Interfaces;
 public interface IAIProvider
 {
     AIProvider ProviderType { get; }
-    Task<AIResponse> GenerateResponseAsync(AIRequest request, CancellationToken ct = default);
+    Task<AIResponseOutDTO> GenerateResponseAsync(AIRequestInDTO request, CancellationToken ct = default);
 }

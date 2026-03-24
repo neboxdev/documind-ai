@@ -67,9 +67,14 @@ public class DocumentEndpointTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Delete_NonExistent_ReturnsNotFound()
+    public async Task Remove_NonExistent_ReturnsNotFound()
     {
-        var response = await _client.DeleteAsync($"/api/documents/{Guid.NewGuid()}");
+        var body = new StringContent(
+            JsonSerializer.Serialize(new { Id = Guid.NewGuid() }),
+            Encoding.UTF8,
+            "application/json");
+
+        var response = await _client.PostAsync("/api/documents/remove", body);
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
@@ -100,7 +105,7 @@ public class DocumentEndpointTests : IClassFixture<CustomWebApplicationFactory>
     }
 
     [Fact]
-    public async Task UploadThenDelete_ReturnsNoContent()
+    public async Task UploadThenRemove_ReturnsNoContent()
     {
         // Upload
         var content = new MultipartFormDataContent();
@@ -113,9 +118,14 @@ public class DocumentEndpointTests : IClassFixture<CustomWebApplicationFactory>
         using var uploadDoc = JsonDocument.Parse(uploadJson);
         var id = uploadDoc.RootElement.GetProperty("id").GetString();
 
-        // Delete
-        var deleteResponse = await _client.DeleteAsync($"/api/documents/{id}");
-        deleteResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        // Remove via POST (not DELETE — per coding rules)
+        var removeBody = new StringContent(
+            JsonSerializer.Serialize(new { Id = id }),
+            Encoding.UTF8,
+            "application/json");
+
+        var removeResponse = await _client.PostAsync("/api/documents/remove", removeBody);
+        removeResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
 
         // Verify it's gone
         var getResponse = await _client.GetAsync($"/api/documents/{id}");

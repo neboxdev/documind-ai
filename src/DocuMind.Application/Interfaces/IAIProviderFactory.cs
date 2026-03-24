@@ -5,5 +5,5 @@ namespace DocuMind.Application.Interfaces;
 public interface IAIProviderFactory
 {
     IAIProvider GetProvider(AIProvider providerType);
-    IReadOnlyList<AIProvider> GetAvailableProviders();
+    AIProvider[] GetAvailableProviders();
 }

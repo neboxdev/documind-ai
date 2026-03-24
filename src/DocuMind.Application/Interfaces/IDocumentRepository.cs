@@ -6,8 +6,8 @@ public interface IDocumentRepository
 {
     Task<Document?> GetByIdAsync(Guid id, CancellationToken ct = default);
     Task<Document?> GetByIdWithChunksAsync(Guid id, CancellationToken ct = default);
-    Task<List<Document>> GetAllAsync(CancellationToken ct = default);
-    Task<(List<Document> Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
+    Task<Document[]> GetAllAsync(CancellationToken ct = default);
+    Task<(Document[] Items, int TotalCount)> GetPagedAsync(int page, int pageSize, CancellationToken ct = default);
     Task AddAsync(Document document, CancellationToken ct = default);
     void Remove(Document document);
     Task SaveChangesAsync(CancellationToken ct = default);

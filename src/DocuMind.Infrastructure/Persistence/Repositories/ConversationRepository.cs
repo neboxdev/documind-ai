@@ -10,7 +10,7 @@ public class ConversationRepository : IConversationRepository
 
     public ConversationRepository(DocuMindDbContext db)
     {
-        _db = db;
+        _db = db ?? throw new ArgumentNullException(nameof(db));
     }
 
     public async Task<Conversation?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -25,12 +25,12 @@ public class ConversationRepository : IConversationRepository
             .FirstOrDefaultAsync(c => c.Id == id, ct);
     }
 
-    public async Task<List<Conversation>> GetByDocumentIdAsync(Guid documentId, CancellationToken ct = default)
+    public async Task<Conversation[]> GetByDocumentIdAsync(Guid documentId, CancellationToken ct = default)
     {
         return await _db.Conversations
             .Where(c => c.DocumentId == documentId)
             .OrderByDescending(c => c.CreatedAt)
-            .ToListAsync(ct);
+            .ToArrayAsync(ct);
     }
 
     public async Task AddAsync(Conversation conversation, CancellationToken ct = default)

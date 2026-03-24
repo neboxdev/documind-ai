@@ -10,7 +10,7 @@ public class DocumentRepository : IDocumentRepository
 
     public DocumentRepository(DocuMindDbContext db)
     {
-        _db = db;
+        _db = db ?? throw new ArgumentNullException(nameof(db));
     }
 
     public async Task<Document?> GetByIdAsync(Guid id, CancellationToken ct = default)
@@ -25,14 +25,14 @@ public class DocumentRepository : IDocumentRepository
             .FirstOrDefaultAsync(d => d.Id == id, ct);
     }
 
-    public async Task<List<Document>> GetAllAsync(CancellationToken ct = default)
+    public async Task<Document[]> GetAllAsync(CancellationToken ct = default)
     {
         return await _db.Documents
             .OrderByDescending(d => d.UploadedAt)
-            .ToListAsync(ct);
+            .ToArrayAsync(ct);
     }
 
-    public async Task<(List<Document> Items, int TotalCount)> GetPagedAsync(
+    public async Task<(Document[] Items, int TotalCount)> GetPagedAsync(
         int page, int pageSize, CancellationToken ct = default)
     {
         var query = _db.Documents
@@ -44,7 +44,7 @@ public class DocumentRepository : IDocumentRepository
         var items = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
-            .ToListAsync(ct);
+            .ToArrayAsync(ct);
 
         return (items, totalCount);
     }

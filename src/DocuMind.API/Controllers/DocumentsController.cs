@@ -13,14 +13,14 @@ public class DocumentsController : ControllerBase
 
     public DocumentsController(IMediator mediator)
     {
-        _mediator = mediator;
+        _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
     }
 
     /// <summary>
     /// Upload a document (PDF, DOCX, or TXT) for processing.
     /// The file is extracted into text chunks immediately.
     /// </summary>
-    [HttpPost("upload")]
+    [HttpPost("upload", Name = nameof(Upload))]
     [Consumes("multipart/form-data")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -42,7 +42,7 @@ public class DocumentsController : ControllerBase
     /// <summary>
     /// List all documents, paginated.
     /// </summary>
-    [HttpGet]
+    [HttpGet(Name = nameof(GetAll))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async Task<IActionResult> GetAll(
         [FromQuery] int page = 1,
@@ -56,7 +56,7 @@ public class DocumentsController : ControllerBase
     /// <summary>
     /// Get a specific document by ID, including its chunk count.
     /// </summary>
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id:guid}", Name = nameof(GetById))]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct)
@@ -66,14 +66,15 @@ public class DocumentsController : ControllerBase
     }
 
     /// <summary>
-    /// Delete a document and all its associated chunks and conversations.
+    /// Remove a document and all its associated chunks and conversations.
+    /// Uses POST instead of DELETE per API conventions — action data in request body.
     /// </summary>
-    [HttpDelete("{id:guid}")]
+    [HttpPost("remove", Name = nameof(Remove))]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken ct)
+    public async Task<IActionResult> Remove([FromBody] DeleteDocumentCommand command, CancellationToken ct)
     {
-        await _mediator.Send(new DeleteDocumentCommand(id), ct);
+        await _mediator.Send(command, ct);
         return NoContent();
     }
 }

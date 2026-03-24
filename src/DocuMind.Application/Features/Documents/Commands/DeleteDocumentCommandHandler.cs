@@ -9,7 +9,7 @@ public class DeleteDocumentCommandHandler : IRequestHandler<DeleteDocumentComman
 
     public DeleteDocumentCommandHandler(IDocumentRepository documents)
     {
-        _documents = documents;
+        _documents = documents ?? throw new ArgumentNullException(nameof(documents));
     }
 
     public async Task Handle(DeleteDocumentCommand request, CancellationToken ct)

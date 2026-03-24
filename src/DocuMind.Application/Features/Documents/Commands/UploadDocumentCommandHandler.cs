@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 
 namespace DocuMind.Application.Features.Documents.Commands;
 
-public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentCommand, DocumentDto>
+public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentCommand, DocumentOutDTO>
 {
     private readonly IDocumentRepository _documents;
     private readonly IEnumerable<ITextExtractor> _extractors;
@@ -20,13 +20,13 @@ public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentComman
         ITextChunker chunker,
         ILogger<UploadDocumentCommandHandler> logger)
     {
-        _documents = documents;
-        _extractors = extractors;
-        _chunker = chunker;
-        _logger = logger;
+        _documents = documents ?? throw new ArgumentNullException(nameof(documents));
+        _extractors = extractors ?? throw new ArgumentNullException(nameof(extractors));
+        _chunker = chunker ?? throw new ArgumentNullException(nameof(chunker));
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
-    public async Task<DocumentDto> Handle(UploadDocumentCommand request, CancellationToken ct)
+    public async Task<DocumentOutDTO> Handle(UploadDocumentCommand request, CancellationToken ct)
     {
         var document = new Document
         {
@@ -51,12 +51,12 @@ public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentComman
                 document.Status = DocumentStatus.Failed;
                 await _documents.AddAsync(document, ct);
                 await _documents.SaveChangesAsync(ct);
-                return ToDto(document, 0);
+                return ToOutDTO(document, 0);
             }
 
             var chunks = _chunker.ChunkText(text);
 
-            for (var i = 0; i < chunks.Count; i++)
+            for (var i = 0; i < chunks.Length; i++)
             {
                 document.Chunks.Add(new DocumentChunk
                 {
@@ -75,9 +75,9 @@ public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentComman
 
             _logger.LogInformation(
                 "Processed {FileName}: {ChunkCount} chunks created",
-                request.FileName, chunks.Count);
+                request.FileName, chunks.Length);
 
-            return ToDto(document, chunks.Count);
+            return ToOutDTO(document, chunks.Length);
         }
         catch (Exception ex)
         {
@@ -88,11 +88,11 @@ public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentComman
             await _documents.AddAsync(document, ct);
             await _documents.SaveChangesAsync(ct);
 
-            return ToDto(document, 0);
+            return ToOutDTO(document, 0);
         }
     }
 
-    private static DocumentDto ToDto(Document doc, int chunkCount)
+    private static DocumentOutDTO ToOutDTO(Document doc, int chunkCount)
         => new(doc.Id, doc.FileName, doc.ContentType, doc.Size,
                doc.Status, doc.UploadedAt, chunkCount);
 }

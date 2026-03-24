@@ -9,7 +9,7 @@ public class TextChunker : ITextChunker
     /// with <paramref name="overlap"/> characters of overlap between consecutive chunks.
     /// Tries to break at sentence boundaries when possible.
     /// </summary>
-    public List<string> ChunkText(string text, int chunkSize = 500, int overlap = 50)
+    public string[] ChunkText(string text, int chunkSize = 500, int overlap = 50)
     {
         if (string.IsNullOrWhiteSpace(text))
             return [];
@@ -50,6 +50,6 @@ public class TextChunker : ITextChunker
                 position = end; // safety: don't go backwards
         }
 
-        return chunks;
+        return chunks.ToArray();
     }
 }

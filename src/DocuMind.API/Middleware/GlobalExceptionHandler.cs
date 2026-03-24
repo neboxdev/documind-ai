@@ -12,7 +12,7 @@ public class GlobalExceptionHandler : IMiddleware
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger)
     {
-        _logger = logger;
+        _logger = logger ?? throw new ArgumentNullException(nameof(logger));
     }
 
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)

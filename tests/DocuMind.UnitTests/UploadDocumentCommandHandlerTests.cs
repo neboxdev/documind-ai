@@ -25,7 +25,7 @@ public class UploadDocumentCommandHandlerTests
 
         _chunkerMock
             .Setup(c => c.ChunkText(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
-            .Returns(["chunk one", "chunk two", "chunk three"]);
+            .Returns(new[] { "chunk one", "chunk two", "chunk three" });
 
         _handler = new UploadDocumentCommandHandler(
             _repoMock.Object,

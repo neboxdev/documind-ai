@@ -74,7 +74,7 @@ public class TextChunkerTests
         var result = _chunker.ChunkText(text, chunkSize: 50, overlap: 15);
 
         // With overlap, adjacent chunks should share some content
-        if (result.Count >= 2)
+        if (result.Length >= 2)
         {
             var endOfFirst = result[0][^15..];
             result[1].Should().Contain(endOfFirst.Trim(),

@@ -1,5 +1,7 @@
 using DocuMind.Application.Interfaces;
 using DocuMind.Infrastructure.AI.Configuration;
+using DocuMind.Infrastructure.AI.Factory;
+using DocuMind.Infrastructure.AI.Providers;
 using DocuMind.Infrastructure.Persistence;
 using DocuMind.Infrastructure.Persistence.Repositories;
 using DocuMind.Infrastructure.TextProcessing;
@@ -32,10 +34,29 @@ public static class DependencyInjection
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<ITextChunker, TextChunker>();
 
-        // AI provider configuration — actual provider implementations
-        // will be registered in Day 3 via AddAIProviders()
+        // AI providers
+        services.AddAIProviders(configuration);
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers AI provider configuration, implementations, and factory.
+    /// Each provider is registered as a singleton IAIProvider so the factory
+    /// can resolve all of them via IEnumerable.
+    /// </summary>
+    public static IServiceCollection AddAIProviders(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
         services.Configure<AIProviderOptions>(
             configuration.GetSection(AIProviderOptions.SectionName));
+
+        // Register each provider as IAIProvider — the factory collects them all
+        services.AddSingleton<IAIProvider, ClaudeAIProvider>();
+        services.AddSingleton<IAIProvider, OpenAIProvider>();
+        services.AddSingleton<IAIProvider, GeminiAIProvider>();
+        services.AddSingleton<IAIProviderFactory, AIProviderFactory>();
 
         return services;
     }

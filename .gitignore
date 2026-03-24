@@ -1,0 +1,49 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## User secrets
+secrets.json
+
+## IDE
+.vs/
+.vscode/
+*.swp
+*~
+
+## Rider
+.idea/
+*.sln.iml
+
+## Build
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+
+## NuGet
+*.nupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+
+## SQLite databases
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+logs/
+*.log
+
+## Docker
+.docker/
+
+## OS
+.DS_Store
+Thumbs.db
+desktop.ini

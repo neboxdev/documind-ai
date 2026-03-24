@@ -1,0 +1,49 @@
+using DocuMind.Application.Interfaces;
+using DocuMind.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace DocuMind.Infrastructure.Persistence.Repositories;
+
+public class DocumentRepository : IDocumentRepository
+{
+    private readonly DocuMindDbContext _db;
+
+    public DocumentRepository(DocuMindDbContext db)
+    {
+        _db = db;
+    }
+
+    public async Task<Document?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _db.Documents.FirstOrDefaultAsync(d => d.Id == id, ct);
+    }
+
+    public async Task<Document?> GetByIdWithChunksAsync(Guid id, CancellationToken ct = default)
+    {
+        return await _db.Documents
+            .Include(d => d.Chunks.OrderBy(c => c.ChunkIndex))
+            .FirstOrDefaultAsync(d => d.Id == id, ct);
+    }
+
+    public async Task<List<Document>> GetAllAsync(CancellationToken ct = default)
+    {
+        return await _db.Documents
+            .OrderByDescending(d => d.UploadedAt)
+            .ToListAsync(ct);
+    }
+
+    public async Task AddAsync(Document document, CancellationToken ct = default)
+    {
+        await _db.Documents.AddAsync(document, ct);
+    }
+
+    public void Remove(Document document)
+    {
+        _db.Documents.Remove(document);
+    }
+
+    public async Task SaveChangesAsync(CancellationToken ct = default)
+    {
+        await _db.SaveChangesAsync(ct);
+    }
+}

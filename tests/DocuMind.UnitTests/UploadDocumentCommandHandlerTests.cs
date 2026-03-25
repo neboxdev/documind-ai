@@ -12,6 +12,7 @@ namespace DocuMind.UnitTests;
 public class UploadDocumentCommandHandlerTests
 {
     private readonly Mock<IDocumentRepository> _repoMock = new();
+    private readonly Mock<IBlobStorageService> _blobMock = new();
     private readonly Mock<ITextChunker> _chunkerMock = new();
     private readonly Mock<ITextExtractor> _extractorMock = new();
     private readonly UploadDocumentCommandHandler _handler;
@@ -27,8 +28,13 @@ public class UploadDocumentCommandHandlerTests
             .Setup(c => c.ChunkText(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
             .Returns(new[] { "chunk one", "chunk two", "chunk three" });
 
+        _blobMock
+            .Setup(b => b.UploadAsync(It.IsAny<Stream>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync("uploads/test-file.txt");
+
         _handler = new UploadDocumentCommandHandler(
             _repoMock.Object,
+            _blobMock.Object,
             [_extractorMock.Object],
             _chunkerMock.Object,
             Mock.Of<ILogger<UploadDocumentCommandHandler>>());

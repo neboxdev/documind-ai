@@ -10,17 +10,20 @@ namespace DocuMind.Application.Features.Documents.Commands;
 public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentCommand, DocumentOutDTO>
 {
     private readonly IDocumentRepository _documents;
+    private readonly IBlobStorageService _blobStorage;
     private readonly IEnumerable<ITextExtractor> _extractors;
     private readonly ITextChunker _chunker;
     private readonly ILogger<UploadDocumentCommandHandler> _logger;
 
     public UploadDocumentCommandHandler(
         IDocumentRepository documents,
+        IBlobStorageService blobStorage,
         IEnumerable<ITextExtractor> extractors,
         ITextChunker chunker,
         ILogger<UploadDocumentCommandHandler> logger)
     {
         _documents = documents ?? throw new ArgumentNullException(nameof(documents));
+        _blobStorage = blobStorage ?? throw new ArgumentNullException(nameof(blobStorage));
         _extractors = extractors ?? throw new ArgumentNullException(nameof(extractors));
         _chunker = chunker ?? throw new ArgumentNullException(nameof(chunker));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -39,6 +42,15 @@ public class UploadDocumentCommandHandler : IRequestHandler<UploadDocumentComman
 
         try
         {
+            // Store the original file in blob storage before extraction.
+            // We need to copy the stream since extraction will read it too.
+            var blobStream = new MemoryStream();
+            await request.FileStream.CopyToAsync(blobStream, ct);
+            blobStream.Position = 0;
+            request.FileStream.Position = 0;
+
+            document.BlobUrl = await _blobStorage.UploadAsync(blobStream, request.FileName, request.ContentType, ct);
+
             var extractor = _extractors.FirstOrDefault(e => e.CanHandle(request.ContentType))
                 ?? throw new InvalidOperationException(
                     $"No text extractor available for content type '{request.ContentType}'");

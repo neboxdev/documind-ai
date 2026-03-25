@@ -4,6 +4,7 @@ using DocuMind.Infrastructure.AI.Factory;
 using DocuMind.Infrastructure.AI.Providers;
 using DocuMind.Infrastructure.Persistence;
 using DocuMind.Infrastructure.Persistence.Repositories;
+using DocuMind.Infrastructure.Storage;
 using DocuMind.Infrastructure.TextProcessing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,13 @@ public static class DependencyInjection
         services.AddSingleton<ITextExtractor, DocxTextExtractor>();
         services.AddSingleton<ITextExtractor, PlainTextExtractor>();
         services.AddSingleton<ITextChunker, TextChunker>();
+
+        // Blob storage — use Azure if configured, otherwise local filesystem
+        var azureStorageConnection = configuration["AzureStorage:ConnectionString"];
+        if (!string.IsNullOrWhiteSpace(azureStorageConnection))
+            services.AddSingleton<IBlobStorageService, AzureBlobStorageService>();
+        else
+            services.AddSingleton<IBlobStorageService, LocalFileStorageService>();
 
         // AI providers
         services.AddAIProviders(configuration);

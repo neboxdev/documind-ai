@@ -3,6 +3,9 @@ bin/
 obj/
 *.user
 *.suo
+
+## Secrets — Development config may contain API keys
+**/appsettings.Development.json
 *.userosscache
 *.sln.docstates
 

@@ -28,6 +28,10 @@
             --radius: 10px;
             --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
             --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.06);
+            /* Provider brand colors */
+            --claude-color: #D97757;
+            --openai-color: #10A37F;
+            --gemini-color: #4285F4;
         }
 
         body {
@@ -73,6 +77,12 @@
             font-size: 1.1rem;
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
         /* ===== HEALTH INDICATOR ===== */
         .health-badge {
             display: flex;
@@ -96,6 +106,39 @@
 
         .health-dot.healthy { background: var(--success); box-shadow: 0 0 6px var(--success); }
         .health-dot.unhealthy { background: var(--danger); box-shadow: 0 0 6px var(--danger); }
+
+        /* ===== PROVIDER STATUS PILLS (header) ===== */
+        .provider-pills {
+            display: flex;
+            gap: 0.35rem;
+        }
+
+        .provider-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.25rem 0.6rem;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.08);
+            opacity: 0.45;
+            transition: opacity 0.3s, background 0.3s;
+        }
+
+        .provider-pill.connected {
+            opacity: 1;
+            background: rgba(255,255,255,0.18);
+        }
+
+        .provider-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #888;
+        }
+
+        .provider-pill.connected .provider-pill-dot { background: var(--success); box-shadow: 0 0 4px var(--success); }
 
         /* ===== MAIN CONTAINER ===== */
         .container {
@@ -135,21 +178,11 @@
             background: #F0F7FF;
         }
 
-        .upload-zone-icon {
-            font-size: 2.5rem;
-            margin-bottom: 0.75rem;
-        }
+        .upload-zone-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
 
-        .upload-zone h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
+        .upload-zone h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
 
-        .upload-zone p {
-            color: var(--text-light);
-            font-size: 0.875rem;
-        }
+        .upload-zone p { color: var(--text-light); font-size: 0.875rem; }
 
         .upload-zone input[type="file"] {
             position: absolute;
@@ -201,10 +234,7 @@
             color: var(--text);
         }
 
-        .doc-grid {
-            display: grid;
-            gap: 0.75rem;
-        }
+        .doc-grid { display: grid; gap: 0.75rem; }
 
         .doc-card {
             background: var(--surface);
@@ -289,45 +319,118 @@
 
         .btn:active { transform: scale(0.97); }
 
-        .btn-primary {
-            background: var(--primary);
-            color: white;
-        }
-
+        .btn-primary { background: var(--primary); color: white; }
         .btn-primary:hover { background: var(--primary-light); }
 
-        .btn-danger {
-            background: transparent;
-            color: var(--danger);
-            padding: 0.5rem 0.65rem;
-        }
-
+        .btn-danger { background: transparent; color: var(--danger); padding: 0.5rem 0.65rem; }
         .btn-danger:hover { background: #FEF2F2; }
 
-        .btn-ghost {
-            background: transparent;
-            color: var(--text-light);
-            padding: 0.5rem 0.75rem;
-        }
-
+        .btn-ghost { background: transparent; color: var(--text-light); padding: 0.5rem 0.75rem; }
         .btn-ghost:hover { background: var(--bg); color: var(--text); }
 
-        .doc-actions {
-            display: flex;
-            gap: 0.25rem;
-            flex-shrink: 0;
-        }
+        .doc-actions { display: flex; gap: 0.25rem; flex-shrink: 0; }
 
         /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1rem;
-            color: var(--text-light);
-        }
-
+        .empty-state { text-align: center; padding: 3rem 1rem; color: var(--text-light); }
         .empty-state-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
         .empty-state h3 { font-size: 1rem; font-weight: 600; color: var(--text); margin-bottom: 0.25rem; }
         .empty-state p { font-size: 0.875rem; }
+
+        /* ===== PROVIDER SELECTOR MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 150;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.15s ease;
+        }
+
+        .modal-overlay.visible { display: flex; }
+
+        .modal {
+            background: var(--surface);
+            border-radius: 14px;
+            padding: 1.75rem;
+            width: 420px;
+            max-width: 90vw;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .modal h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.35rem;
+        }
+
+        .modal p {
+            font-size: 0.85rem;
+            color: var(--text-light);
+            margin-bottom: 1.25rem;
+        }
+
+        .provider-option {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            padding: 0.85rem 1rem;
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+            margin-bottom: 0.5rem;
+        }
+
+        .provider-option:hover { border-color: var(--accent); background: #F8FBFF; }
+        .provider-option.selected { border-color: var(--accent); background: #EFF6FF; }
+        .provider-option.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .provider-logo {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .provider-logo.claude { background: var(--claude-color); }
+        .provider-logo.openai { background: var(--openai-color); }
+        .provider-logo.gemini { background: var(--gemini-color); }
+
+        .provider-option-info { flex: 1; }
+        .provider-option-name { font-weight: 600; font-size: 0.9rem; }
+        .provider-option-model { font-size: 0.75rem; color: var(--text-light); }
+
+        .provider-option-badge {
+            font-size: 0.65rem;
+            font-weight: 600;
+            padding: 0.15rem 0.5rem;
+            border-radius: 8px;
+            text-transform: uppercase;
+        }
+
+        .provider-option-badge.connected { background: #ECFDF5; color: #065F46; }
+        .provider-option-badge.not-connected { background: #FEF2F2; color: #991B1B; }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.5rem;
+            margin-top: 1.25rem;
+        }
+
+        .modal-actions .btn { padding: 0.55rem 1.25rem; }
 
         /* ===== CHAT SECTION ===== */
         .chat-header {
@@ -337,17 +440,41 @@
             box-shadow: var(--shadow);
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.75rem;
             margin-bottom: 1rem;
         }
+
+        .chat-header-info { flex: 1; min-width: 0; }
 
         .chat-header h2 {
             font-size: 1rem;
             font-weight: 600;
-            flex: 1;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+        }
+
+        /* Provider + model tag shown in chat header */
+        .chat-provider-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 8px;
+            margin-top: 3px;
+        }
+
+        .chat-provider-tag.claude { background: #FFF3EF; color: var(--claude-color); }
+        .chat-provider-tag.openai { background: #ECFDF5; color: var(--openai-color); }
+        .chat-provider-tag.gemini { background: #EFF6FF; color: var(--gemini-color); }
+
+        .chat-provider-tag .tag-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: currentColor;
         }
 
         .chat-messages {
@@ -401,6 +528,12 @@
             font-size: 0.7rem;
             margin-top: 0.35rem;
             opacity: 0.65;
+        }
+
+        .message.assistant .message-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
         }
 
         /* ===== TYPING INDICATOR ===== */
@@ -501,6 +634,7 @@
 
         .toast-error { background: var(--danger); }
         .toast-success { background: var(--success); }
+        .toast-warning { background: var(--warning); color: #1E293B; }
 
         @keyframes slideIn {
             from { transform: translateX(100%); opacity: 0; }
@@ -519,6 +653,7 @@
             .message { max-width: 90%; }
             .doc-card { flex-wrap: wrap; }
             .doc-actions { width: 100%; justify-content: flex-end; }
+            .provider-pills { display: none; }
         }
     </style>
 </head>
@@ -530,9 +665,13 @@
             <div class="logo-icon">&#128209;</div>
             DocuMind AI
         </div>
-        <div class="health-badge" id="healthBadge" title="API Status">
-            <span class="health-dot" id="healthDot"></span>
-            <span id="healthLabel">Checking...</span>
+        <div class="header-right">
+            <!-- Provider connection status pills -->
+            <div class="provider-pills" id="providerPills"></div>
+            <div class="health-badge" id="healthBadge" title="API Status">
+                <span class="health-dot" id="healthDot"></span>
+                <span id="healthLabel">Checking...</span>
+            </div>
         </div>
     </header>
 
@@ -574,7 +713,10 @@
         <div class="section" id="chatSection">
             <div class="chat-header">
                 <button class="btn btn-ghost" onclick="showDocuments()">&#8592; Back</button>
-                <h2 id="chatDocName">Document</h2>
+                <div class="chat-header-info">
+                    <h2 id="chatDocName">Document</h2>
+                    <div id="chatProviderTag"></div>
+                </div>
             </div>
             <div class="chat-messages" id="chatMessages">
                 <div class="chat-empty" id="chatEmpty">
@@ -596,16 +738,40 @@
         </div>
     </div>
 
+    <!-- ===== PROVIDER SELECTOR MODAL ===== -->
+    <div class="modal-overlay" id="providerModal">
+        <div class="modal">
+            <h3>Choose AI Provider</h3>
+            <p>Select which AI model should answer questions about this document.</p>
+            <div id="providerOptions"></div>
+            <div class="modal-actions">
+                <button class="btn btn-ghost" onclick="closeProviderModal()">Cancel</button>
+                <button class="btn btn-primary" id="startChatBtn" onclick="confirmProvider()">Start Chat</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Toast notifications -->
     <div class="toast-container" id="toastContainer"></div>
 
     <script>
         // ===== CONFIGURATION =====
-        const API_BASE = 'http://localhost:5000';
+        // Change this to match where your API is running
+        const API_BASE = 'http://localhost:5064';
+
+        // Provider display metadata
+        const PROVIDER_META = {
+            Claude:  { label: 'Claude',  cssClass: 'claude',  abbrev: 'C' },
+            OpenAI:  { label: 'ChatGPT', cssClass: 'openai',  abbrev: 'G' },
+            Gemini:  { label: 'Gemini',  cssClass: 'gemini',  abbrev: 'G' }
+        };
 
         // ===== STATE =====
         let currentDocumentId = null;
+        let currentDocumentName = null;
         let currentConversationId = null;
+        let selectedProvider = null;
+        let availableProviders = []; // populated from GET /api/providers
 
         // ===== DOM REFERENCES =====
         const $id = (id) => document.getElementById(id);
@@ -635,7 +801,6 @@
         }
 
         // ===== HEALTH CHECK =====
-        // Polls the API health endpoint and updates the header indicator.
         async function checkHealth() {
             try {
                 const res = await fetch(`${API_BASE}/health`, { signal: AbortSignal.timeout(5000) });
@@ -651,6 +816,45 @@
         checkHealth();
         setInterval(checkHealth, 30000);
 
+        // ===== LOAD AVAILABLE PROVIDERS =====
+        // Fetches from GET /api/providers and updates the header pills + modal options.
+        async function loadProviders() {
+            try {
+                const res = await fetch(`${API_BASE}/api/providers`);
+                if (!res.ok) throw new Error();
+                availableProviders = await res.json();
+            } catch {
+                availableProviders = [];
+            }
+            renderProviderPills();
+        }
+
+        // Render small pills in the header showing which providers are connected
+        function renderProviderPills() {
+            const container = $id('providerPills');
+            container.innerHTML = '';
+
+            // Show all three, mark which ones are connected
+            const allProviders = ['Claude', 'OpenAI', 'Gemini'];
+            allProviders.forEach(name => {
+                const meta = PROVIDER_META[name];
+                const connected = availableProviders.some(p => p.name === name);
+                const pill = document.createElement('div');
+                pill.className = `provider-pill ${connected ? 'connected' : ''}`;
+                pill.title = connected ? `${meta.label}: connected` : `${meta.label}: no API key`;
+                pill.innerHTML = `<span class="provider-pill-dot"></span>${meta.label}`;
+                container.appendChild(pill);
+            });
+
+            if (availableProviders.length === 0) {
+                toast('No AI providers configured. Add API keys to enable chat.', 'warning');
+            }
+        }
+
+        loadProviders();
+        // Refresh provider status every 60 seconds
+        setInterval(loadProviders, 60000);
+
         // ===== SECTION NAVIGATION =====
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -660,12 +864,11 @@
         function showDocuments() {
             showSection('documentsSection');
             currentDocumentId = null;
+            currentDocumentName = null;
             currentConversationId = null;
         }
 
         // ===== FILE UPLOAD =====
-        // Handles drag & drop and the file picker. Sends as multipart/form-data.
-
         uploadZone.addEventListener('dragover', (e) => {
             e.preventDefault();
             uploadZone.classList.add('drag-over');
@@ -701,13 +904,11 @@
                 return;
             }
 
-            // Show progress bar
             progressFile.textContent = file.name;
             progressPct.textContent = '0%';
             progressFill.style.width = '0%';
             progressBox.classList.add('visible');
 
-            // Simulate progress since fetch doesn't support upload progress natively
             let pct = 0;
             const progressInterval = setInterval(() => {
                 pct = Math.min(pct + Math.random() * 15, 90);
@@ -746,8 +947,6 @@
         }
 
         // ===== DOCUMENT LIST =====
-        // Fetches all documents from the API and renders them as cards.
-
         async function loadDocuments() {
             try {
                 const res = await fetch(`${API_BASE}/api/documents?page=1&pageSize=50`);
@@ -787,7 +986,7 @@
                             </div>
                         </div>
                         <div class="doc-actions">
-                            <button class="btn btn-primary" onclick="openChat('${doc.id}', '${doc.fileName.replace(/'/g, "\\'")}')">
+                            <button class="btn btn-primary" onclick="openProviderModal('${doc.id}', '${doc.fileName.replace(/'/g, "\\'")}')">
                                 &#128172; Chat
                             </button>
                             <button class="btn btn-danger" onclick="deleteDocument('${doc.id}')" title="Delete">
@@ -817,26 +1016,112 @@
             }
         }
 
-        // ===== OPEN CHAT =====
-        // Creates a new conversation for the document, then switches to chat view.
+        // ===== PROVIDER SELECTOR MODAL =====
+        // Opens before entering chat so the user can pick which AI to use.
 
-        async function openChat(documentId, fileName) {
+        function openProviderModal(documentId, fileName) {
+            currentDocumentId = documentId;
+            currentDocumentName = fileName;
+            selectedProvider = null;
+
+            const container = $id('providerOptions');
+            container.innerHTML = '';
+
+            const allProviders = ['Claude', 'OpenAI', 'Gemini'];
+            allProviders.forEach(name => {
+                const meta = PROVIDER_META[name];
+                const providerData = availableProviders.find(p => p.name === name);
+                const connected = !!providerData;
+
+                const option = document.createElement('div');
+                option.className = `provider-option ${!connected ? 'disabled' : ''}`;
+                option.dataset.provider = name;
+                option.innerHTML = `
+                    <div class="provider-logo ${meta.cssClass}">${meta.abbrev}</div>
+                    <div class="provider-option-info">
+                        <div class="provider-option-name">${meta.label}</div>
+                        <div class="provider-option-model">${connected ? providerData.modelId : 'No API key configured'}</div>
+                    </div>
+                    <span class="provider-option-badge ${connected ? 'connected' : 'not-connected'}">
+                        ${connected ? 'Ready' : 'No Key'}
+                    </span>
+                `;
+
+                if (connected) {
+                    option.addEventListener('click', () => selectProviderOption(option, name));
+
+                    // Auto-select the default provider
+                    if (providerData.isDefault) {
+                        selectedProvider = name;
+                        option.classList.add('selected');
+                    }
+                }
+
+                container.appendChild(option);
+            });
+
+            // If no default was found, select the first connected one
+            if (!selectedProvider && availableProviders.length > 0) {
+                selectedProvider = availableProviders[0].name;
+                const first = container.querySelector(`.provider-option[data-provider="${selectedProvider}"]`);
+                if (first) first.classList.add('selected');
+            }
+
+            $id('startChatBtn').disabled = !selectedProvider;
+            $id('providerModal').classList.add('visible');
+        }
+
+        function selectProviderOption(element, providerName) {
+            document.querySelectorAll('.provider-option').forEach(o => o.classList.remove('selected'));
+            element.classList.add('selected');
+            selectedProvider = providerName;
+            $id('startChatBtn').disabled = false;
+        }
+
+        function closeProviderModal() {
+            $id('providerModal').classList.remove('visible');
+            selectedProvider = null;
+        }
+
+        async function confirmProvider() {
+            if (!selectedProvider) return;
+            closeProviderModal();
+            await openChat(currentDocumentId, currentDocumentName, selectedProvider);
+        }
+
+        // ===== OPEN CHAT =====
+        async function openChat(documentId, fileName, provider) {
             currentDocumentId = documentId;
             $id('chatDocName').textContent = fileName;
-            chatMessages.innerHTML = `<div class="chat-empty">Ask a question about this document</div>`;
+            chatMessages.innerHTML = '<div class="chat-empty">Ask a question about this document</div>';
             chatInput.value = '';
             showSection('chatSection');
+
+            // Show provider + model tag in header
+            const meta = PROVIDER_META[provider] || { label: provider, cssClass: 'claude' };
+            const providerData = availableProviders.find(p => p.name === provider);
+            const modelId = providerData ? providerData.modelId : '';
+            $id('chatProviderTag').innerHTML = `
+                <span class="chat-provider-tag ${meta.cssClass}">
+                    <span class="tag-dot"></span>
+                    ${meta.label}${modelId ? ' &middot; ' + modelId : ''}
+                </span>
+            `;
+
             chatInput.focus();
 
-            // Create a new conversation
+            // Create a new conversation with the selected provider
             try {
                 const res = await fetch(`${API_BASE}/api/documents/${documentId}/conversations`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title: `Chat about ${fileName}` })
+                    body: JSON.stringify({ title: `Chat about ${fileName}`, provider: provider })
                 });
 
-                if (!res.ok) throw new Error('Failed to create conversation');
+                if (!res.ok) {
+                    const err = await res.json().catch(() => null);
+                    throw new Error(err?.title || `Failed to create conversation (${res.status})`);
+                }
 
                 const convo = await res.json();
                 currentConversationId = convo.id;
@@ -848,8 +1133,6 @@
         }
 
         // ===== SEND MESSAGE =====
-        // Sends the user message, shows the typing indicator, and appends the AI response.
-
         chatInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault();
@@ -861,11 +1144,9 @@
             const text = chatInput.value.trim();
             if (!text || !currentConversationId) return;
 
-            // Remove the empty state placeholder
             const empty = chatMessages.querySelector('.chat-empty');
             if (empty) empty.remove();
 
-            // Append user bubble
             appendMessage('user', text);
             chatInput.value = '';
             sendBtn.disabled = true;
@@ -881,19 +1162,23 @@
 
                 if (!res.ok) {
                     const err = await res.json().catch(() => null);
-                    throw new Error(err?.title || `Request failed (${res.status})`);
+                    const errorMsg = err?.extensions?.errors?.[0]
+                        || err?.title
+                        || `Request failed (${res.status})`;
+                    throw new Error(errorMsg);
                 }
 
                 const msg = await res.json();
 
-                // Build metadata line
-                const tokens = msg.promptTokens != null
-                    ? `${msg.modelId} · ${msg.promptTokens + msg.completionTokens} tokens`
-                    : '';
-                appendMessage('assistant', msg.content, tokens);
+                // Build metadata line with model info and token count
+                const tokenTotal = (msg.promptTokens || 0) + (msg.completionTokens || 0);
+                const metaParts = [];
+                if (msg.modelId) metaParts.push(msg.modelId);
+                if (tokenTotal > 0) metaParts.push(`${tokenTotal} tokens`);
+                appendMessage('assistant', msg.content, metaParts.join(' \u00b7 '));
 
             } catch (err) {
-                appendMessage('assistant', `Sorry, something went wrong: ${err.message}`);
+                appendMessage('assistant', `Something went wrong: ${err.message}`);
             } finally {
                 typing.classList.remove('visible');
                 sendBtn.disabled = false;

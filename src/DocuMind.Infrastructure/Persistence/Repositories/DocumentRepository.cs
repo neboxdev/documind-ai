@@ -49,6 +49,47 @@ public class DocumentRepository : IDocumentRepository
         return (items, totalCount);
     }
 
+    /// <summary>
+    /// Simple keyword-based relevance search: splits the query into words,
+    /// scores each chunk by how many query words appear in it, and returns
+    /// the top N. This is v1 — a proper implementation would use embeddings.
+    /// </summary>
+    public async Task<DocumentChunk[]> FindRelevantChunksAsync(
+        Guid documentId, string query, int maxChunks = 5, CancellationToken ct = default)
+    {
+        var chunks = await _db.DocumentChunks
+            .Where(c => c.DocumentId == documentId)
+            .ToListAsync(ct);
+
+        if (chunks.Count == 0)
+            return [];
+
+        var keywords = query
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Where(w => w.Length > 2) // skip tiny words like "a", "is", "of"
+            .Select(w => w.ToLowerInvariant())
+            .Distinct()
+            .ToArray();
+
+        if (keywords.Length == 0)
+            return chunks.OrderBy(c => c.ChunkIndex).Take(maxChunks).ToArray();
+
+        // Score each chunk by keyword hit count
+        var scored = chunks
+            .Select(c => new
+            {
+                Chunk = c,
+                Score = keywords.Count(k => c.Content.Contains(k, StringComparison.OrdinalIgnoreCase))
+            })
+            .OrderByDescending(x => x.Score)
+            .ThenBy(x => x.Chunk.ChunkIndex)
+            .Take(maxChunks)
+            .Select(x => x.Chunk)
+            .ToArray();
+
+        return scored;
+    }
+
     public async Task AddAsync(Document document, CancellationToken ct = default)
     {
         await _db.Documents.AddAsync(document, ct);

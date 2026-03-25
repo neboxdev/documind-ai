@@ -13,4 +13,14 @@ public interface IAIProviderFactory
     /// for all providers that have an API key configured.
     /// </summary>
     ProviderOutDTO[] GetAvailableProviderDetails();
+
+    /// <summary>
+    /// Returns the default model ID configured for a given provider.
+    /// </summary>
+    string GetModelIdForProvider(AIProvider providerType);
+
+    /// <summary>
+    /// Returns the default provider type from configuration.
+    /// </summary>
+    AIProvider GetDefaultProvider();
 }

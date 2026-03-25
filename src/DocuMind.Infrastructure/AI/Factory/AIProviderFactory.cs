@@ -65,6 +65,19 @@ public class AIProviderFactory : IAIProviderFactory
             .ToArray();
     }
 
+    public string GetModelIdForProvider(AIProviderEnum providerType)
+    {
+        return GetSettingsFor(providerType).ModelId;
+    }
+
+    public AIProviderEnum GetDefaultProvider()
+    {
+        if (Enum.TryParse<AIProviderEnum>(_options.DefaultProvider, ignoreCase: true, out var provider))
+            return provider;
+
+        return AIProviderEnum.Claude;
+    }
+
     private ProviderSettings GetSettingsFor(AIProviderEnum provider) => provider switch
     {
         AIProviderEnum.Claude => _options.Claude,

@@ -45,6 +45,15 @@ try
     builder.Services.AddTransient<GlobalExceptionHandler>();
     builder.Services.AddHealthChecks();
 
+    // CORS for frontend
+    builder.Services.AddCors(options =>
+    {
+        options.AddDefaultPolicy(policy => policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader());
+    });
+
     var app = builder.Build();
 
     // Auto-migrate in development — EnsureCreated works for both SQLite and InMemory
@@ -55,6 +64,7 @@ try
         db.Database.EnsureCreated();
     }
 
+    app.UseCors();
     app.UseSerilogRequestLogging();
     app.UseMiddleware<GlobalExceptionHandler>();
 

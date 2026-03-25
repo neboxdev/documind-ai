@@ -1,6 +1,7 @@
 # DocuMind AI
 
-![Build Status](https://github.com/your-username/DocuMindAI/actions/workflows/deploy.yml/badge.svg)
+![Build Status](https://github.com/neboxdev/documind-ai/actions/workflows/deploy.yml/badge.svg)
+![GitHub](https://img.shields.io/github/license/neboxdev/documind-ai)
 
 A production-grade .NET 9 REST API for intelligent document analysis. Upload documents (PDF, DOCX, TXT), then have natural-language conversations about their content using your choice of AI provider — Claude, ChatGPT, or Gemini. Each conversation locks in a provider, keeping context consistent throughout the exchange.
 
@@ -56,7 +57,7 @@ A production-grade .NET 9 REST API for intelligent document analysis. Upload doc
 ## Quick Start
 
 ```bash
-git clone https://github.com/your-username/DocuMindAI.git
+git clone https://github.com/neboxdev/documind-ai.git
 cd DocuMindAI
 dotnet run --project src/DocuMind.API
 ```
@@ -160,6 +161,10 @@ curl -X POST https://localhost:5001/api/conversations/{conversationId}/messages 
 | GET    | /api/conversations/{id}/messages          | Get message history                   |
 | GET    | /health                                   | Basic health check                    |
 | GET    | /health/detailed                          | DB + AI providers + storage status    |
+
+## Frontend
+
+A lightweight HTML/CSS/JS frontend is included in the `frontend/` folder. Open `frontend/index.html` in your browser (with the API running) to interact with DocuMind AI without any tools. No build step required.
 
 ## Docker
 
